@@ -11,6 +11,7 @@ const { sendStatuses } = require("../Telegram")
 dotenv.config({ path: path.resolve(__dirname, "../.env") })
 
 
+console.log( process.env.ANTHROPIC_API_KEY)
 
 const pc = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY
