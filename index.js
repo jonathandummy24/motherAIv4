@@ -17,7 +17,7 @@ if (!fs.existsSync(downloadDir)) {
 }
 
 app.get("/test", (req,res)=>{
-    res.status(200).send("<h1> Hello There great Back up! </h1>")
+    res.status(200).send("<h1> Hello There~~ </h1>")
 })
 app.use('/ai', router)
 app.listen(process.env.PORT,()=>{

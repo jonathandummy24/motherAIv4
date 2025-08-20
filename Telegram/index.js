@@ -114,7 +114,7 @@ bot.on('message', async (msg) => {
     // Handle /start command - always resets the session
     if (userMessage.toLowerCase() === '/start') {
       resetSession(chatId);
-      await bot.sendMessage(chatId, "👋 Welcome! Let's start fresh. Please enter your email addresscc:");
+      await bot.sendMessage(chatId, "👋 Welcome! Let's start fresh. Please enter your email address:");
       return;
     }
 
