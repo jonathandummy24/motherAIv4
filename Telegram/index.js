@@ -8,8 +8,8 @@ const TelegramBot = require("node-telegram-bot-api")
 const bot = new TelegramBot(process.env.TELEGRAM, { polling: true })
 const { loginUserBot, getUserDepartment } = require("../controller/userController")
 const { createFileinDateFolder, uploadVideoToDrive } = require('../Google/index');
+const { ask_cluade1, website_agent, seo_specialist, copyWriting_agent } = require("../ScriptTool");
 const { ask_question } = require("../pinecone");
-const { ask_cluade1, website_agent, seo_specialist, copyWriting_agent } = require("../ScriptTool")
 
 const loginSteps = new Map();
 
@@ -114,7 +114,7 @@ bot.on('message', async (msg) => {
     // Handle /start command - always resets the session
     if (userMessage.toLowerCase() === '/start') {
       resetSession(chatId);
-      await bot.sendMessage(chatId, "👋 Welcome! Let's start fresh. Please enter your email address:");
+      await bot.sendMessage(chatId, "👋 Welcome! Let's start fresh. Please enter your email addresscc:");
       return;
     }
 
@@ -199,13 +199,15 @@ bot.on('message', async (msg) => {
 
       case LOGIN_STATES.AUTHENTICATED:
         // User is logged in - process their message
+
+      
         await handleAuthenticatedMessage(chatId, userMessage, username, session);
         break;
 
       default:
         // Unknown state - reset
         resetSession(chatId);
-        await bot.sendMessage(chatId, "👋 Welcome! Please enter your email address:");
+        await bot.sendMessage(chatId, "👋 Welcome! Please enter your email address");
         break;
     }
 
@@ -225,8 +227,14 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     const { department } = session.data;
     await bot.sendChatAction(chatId, 'typing');
     ;
+    console.log("The deparment");
+    console.log(department);
+    
+    
     let responseMessage = ""
-    if (department && department.trim().toLowerCase() === 'video') {
+    
+    if(department!==null){
+      if (department && department.trim().toLowerCase() === 'video') {
       responseMessage = await ask_cluade(userMessage)
       await bot.sendMessage(chatId, responseMessage, {
         parse_mode: "Markdown",
@@ -287,9 +295,10 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
       await bot.sendMessage(chatId, res);
       return
     }
+    }
     else {
+   console.log("Here")
       const response = await invokeTool(userMessage)
-
       await bot.sendMessage(chatId, response)
       return
     }
