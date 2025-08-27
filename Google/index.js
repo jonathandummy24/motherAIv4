@@ -7,10 +7,14 @@ const xlsx = require('xlsx')
 const pdfParse = require("pdf-parse")
 const { parse: csvParse } = require('csv-parse/sync');
 
-const CLIENT_ID ="1034743257294-k1ua0drj0kibbsn3mfasl7rcs6i6r0f0.apps.googleusercontent.com"
-const CLIENT_SECRET = "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"
-const REDIRECT_URL = "https://developers.google.com/oauthplayground"
-const REFRESH_TOKEN = "1//04h8ZjG1r5io0CgYIARAAGAQSNwF-L9Ir5pLn3PH7tU3g_omVwC5usTojFyXIUZyzc2ZTsxRTVyLImo8O0FidfafVgO1rQG7DWF0"
+const CLIENT_ID =process.env.CLIENT_ID
+const CLIENT_SECRET = process.env.CLIENT_SECRET
+const REDIRECT_URL = process.env.REDIRECT_URL
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN
+
+
+console.log(CLIENT_ID,CLIENT_SECRET,REDIRECT_URL,REFRESH_TOKEN);
+
  const downloadDir = path.join(process.cwd(), 'downloads');
 const oauthclient = new google.auth.OAuth2(
     CLIENT_ID,
@@ -37,9 +41,9 @@ async function getFolderId(folderName) {
         if (response.data.files.length > 0) {
             return response.data.files[0].id;
         }
-        throw new Error('Coltium folder not found');
+        throw new Error( folderName +' folder not found');
     } catch (error) {
-        console.error('Error finding coltium folder:', error);
+        console.error('Error finding  folder:', error);
         throw error;
     }
 }

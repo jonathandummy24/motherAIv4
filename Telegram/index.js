@@ -10,6 +10,7 @@ const { loginUserBot, getUserDepartment } = require("../controller/userControlle
 const { createFileinDateFolder, uploadVideoToDrive } = require('../Google/index');
 const { ask_cluade1, website_agent, seo_specialist, copyWriting_agent } = require("../ScriptTool");
 const { ask_question } = require("../pinecone");
+const { generateVideo } = require("../VideoTools");
 
 const loginSteps = new Map();
 
@@ -235,19 +236,18 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     
     if(department!==null){
       if (department && department.trim().toLowerCase() === 'video') {
-      responseMessage = await ask_cluade(userMessage)
+      responseMessage = await ask_cluade1(userMessage)
       await bot.sendMessage(chatId, responseMessage, {
-        parse_mode: "Markdown",
+        parse_mode: "None",
         disable_web_page_preview: true
       })
       await createFileinDateFolder(responseMessage)
-      //
+      
       statusMessage = await bot.sendMessage(chatId, "🎬 Generating your video... This may take some minutes, please wait!");
-      //video
 
-      const videoName = await generateVideo(userMessage)
-      const videoPath = path.join(__dirname, 'generated_videos', videoName);
-      //  const videoPath="C:\\Users\\Joe\\Desktop\\Coltium\\motherAIv3\\controllers\\generated_videos\\VID_20250719_141509_024.mp4"
+      const videoPath = await generateVideo(userMessage)
+      // const videoPath = path.join(__dirname, 'generated_videos', videoName);
+      // const videoPath=`C:\\Users\\Joe\\Desktop\\Coltium\\motherAIv4\\VideoTools\\generated_videos\\${videoName}`
 
       await bot.editMessageText("📤 Video ready! Uploading to Telegram...", {
         chat_id: chatId,

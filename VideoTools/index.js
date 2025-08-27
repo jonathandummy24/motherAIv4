@@ -76,8 +76,13 @@ async function generateVideo(prompt) {
       });
       
       const vpath = path.join(__dirname, 'generated_videos', videoName);
+
+      // console.log("Video Link");
+      // console.log(vpath);
+      
+      
       await uploadVideoToDrive(vpath)
-      return videoName;
+      return vpath;
     } else {
       throw new Error("No video was generated");
     }

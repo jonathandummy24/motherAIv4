@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music World</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .music-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .player {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #333;
+            color: white;
+        }
+        
+        .playlist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .playlist li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .playlist li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Music World</h1>
+        <p>Your gateway to amazing tunes</p>
+    </header>
+    
+    <div class="container">
+        <section class="music-section">
+            <h2>Featured Music</h2>
+            <div class="player">
+                <audio controls>
+                    <source src="sample-music.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <p>Sample Track - Demo Artist</p>
+            </div>
+        </section>
+        
+        <section class="music-section">
+            <h2>Popular Genres</h2>
+            <ul>
+                <li>Rock</li>
+                <li>Pop</li>
+                <li>Hip Hop</li>
+                <li>Jazz</li>
+                <li>Classical</li>
+                <li>Electronic</li>
+            </ul>
+        </section>
+        
+        <section class="music-section">
+            <h2>Weekly Playlist</h2>
+            <ul class="playlist">
+                <li>Song One - Artist A</li>
+                <li>Song Two - Artist B</li>
+                <li>Song Three - Artist C</li>
+                <li>Song Four - Artist D</li>
+                <li>Song Five - Artist E</li>
+            </ul>
+        </section>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 Music World. All rights reserved.</p>
+    </footer>
+</body>
+</html>
