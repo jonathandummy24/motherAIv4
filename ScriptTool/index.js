@@ -1,8 +1,7 @@
 const path = require("path")
 const dotenv = require("dotenv")
 const {SystemMessage,HumanMessage,AIMessage} =require("@langchain/core/messages")
-
-const {ChatAnthropic,} =require("@langchain/anthropic")
+const {ChatOpenAI} = require("@langchain/openai")
 const { createFileinDateFolder, getBrandNameText } = require("../Google")
 
 dotenv.config({path: path.resolve(__dirname, "../.env")})
@@ -10,12 +9,12 @@ dotenv.config({path: path.resolve(__dirname, "../.env")})
 async function ask_cluade(question) {
 
     // await sendStatuses("Executing Script Generator with question: ", question)
-const model = new ChatAnthropic({
-  modelName: "claude-3-7-sonnet-latest",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  maxTokens: 1024,
-  temperature: 0.7,
-});
+  const model = new ChatOpenAI({
+    modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    maxTokens: 1024,
+    temperature: 0.7,
+  });
 
 const messages=[
     new SystemMessage("You are an helpful assistant, who is able to write a script to be used to make a video, return normal text and interpret the Markdown format"),
@@ -36,12 +35,12 @@ try {
    
 }
 async function ask_cluade1(question) {
-const model = new ChatAnthropic({
-  modelName: "claude-3-7-sonnet-latest",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  maxTokens: 1024,
-  temperature: 0.7,
-});
+  const model = new ChatOpenAI({
+    modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    maxTokens: 1024,
+    temperature: 0.7,
+  });
 
 const messages=[
     new SystemMessage("You are an helpful assistant"),
@@ -62,12 +61,12 @@ try {
 }
 
 async function website_agent(question) {
-const model = new ChatAnthropic({
-  modelName: "claude-3-7-sonnet-latest",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  maxTokens: 1024,
-  temperature: 0.7,
-});
+  const model = new ChatOpenAI({
+    modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    maxTokens: 1024,
+    temperature: 0.7,
+  });
 
 const messages=[
     new SystemMessage("You are a Specialized Website Creation Specialist, responsible for creating stunning websites based on user requirements"),
@@ -89,12 +88,12 @@ try {
 
 
 async function copyWriting_agent(question) {
-const model = new ChatAnthropic({
-  modelName: "claude-3-7-sonnet-latest",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  maxTokens: 1024,
-  temperature: 0.7,
-});
+  const model = new ChatOpenAI({
+    modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    maxTokens: 1024,
+    temperature: 0.7,
+  });
 
 const content= await getBrandNameText()
 
@@ -118,12 +117,12 @@ try {
    
 }
 async function seo_specialist(question) {
-const model = new ChatAnthropic({
-  modelName: "claude-3-7-sonnet-latest",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  maxTokens: 1024,
-  temperature: 0.7,
-});
+  const model = new ChatOpenAI({
+    modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    maxTokens: 1024,
+    temperature: 0.7,
+  });
 
 const messages=[
     new SystemMessage("You are a Specialized SEO optimization Specialist responsible for optimizing web content to help rank in search engine based on user requirements"),

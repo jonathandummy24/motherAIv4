@@ -1,6 +1,6 @@
 const { OpenAIEmbeddings } = require("@langchain/openai")
 const { Pinecone } = require("@pinecone-database/pinecone")
-const { ChatAnthropic } = require("@langchain/anthropic")
+const { ChatOpenAI } = require("@langchain/openai")
 const path = require('path')
 const dotenv = require('dotenv')
 const { PineconeStore } = require("@langchain/pinecone")
@@ -9,10 +9,6 @@ const { ConversationalRetrievalQAChain } = require("langchain/chains")
 const { sendStatuses } = require("../Telegram")
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") })
-
-
-console.log( process.env.ANTHROPIC_API_KEY)
-
 const pc = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY
 })
@@ -36,10 +32,12 @@ async function ask_question(question,department) {
             namespace:department
         })
 
-        const llm = new ChatAnthropic({
-            model: "claude-3-5-sonnet-20241022", // Updated to correct model name
+     
+
+          const llm = new ChatOpenAI({
+            modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+            openAIApiKey: process.env.OPENAI_API_KEY,
             temperature: 0.7,
-            apiKey: process.env.ANTHROPIC_API_KEY
         });
 
         const memory = new BufferMemory({
