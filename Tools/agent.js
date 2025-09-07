@@ -178,7 +178,10 @@
           
 //                 // await sendStatuses(`Executing Agent: ${toolName}`)
 //                 try {
+//                     console.log("👉 ChatGPT requested tool:", toolName)
+//                     console.log("🧾 With args:", toolArgs)
 //                     const toolResult = await executeTool(toolName, toolArgs)
+//                     console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
                  
 //                     // Add tool result to messages
 //                     messages.push({
@@ -236,6 +239,17 @@ const { sendStatuses } = require("../Telegram/index")
 const { ask_cluade } = require("../ScriptTool/index")
 const { generateVideo } = require("../VideoTools/index")
 dotenv.config({ path: path.resolve(__dirname, "../.env") })
+
+
+const memoryStore = new Map()
+
+function getMemory(sessionId) {
+  return memoryStore.get(sessionId) || []
+}
+
+function saveMemory(sessionId, messages) {
+  memoryStore.set(sessionId, messages)
+}
 
 async function listDepartment() {
     await sendStatuses("Executing List Departments..")
@@ -362,8 +376,12 @@ const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 })
 
-async function invokeTool(message, maxIterations = 15) {
-    let messages = [{ role: 'user', content: message }]
+async function invokeTool(message, sessionId = "default", maxIterations = 15) {
+    let messages = getMemory(sessionId)
+
+    // Add new user message
+    messages.push({ role: 'user', content: message })
+
     let iteration = 0
 
     while (iteration < maxIterations) {
@@ -371,15 +389,13 @@ async function invokeTool(message, maxIterations = 15) {
 
         try {
             const response = await client.chat.completions.create({
-                model: "gpt-4o-mini", // Or gpt-4.1 / gpt-4o
-                messages: messages,
+                model: "gpt-4.1",
+                messages,
                 tools: getToolDefinitions(),
                 tool_choice: "auto",
-                max_tokens: 1024,
             })
 
             const choice = response.choices[0].message
-
             messages.push(choice)
 
             if (choice.tool_calls) {
@@ -388,11 +404,11 @@ async function invokeTool(message, maxIterations = 15) {
                     const toolArgs = JSON.parse(toolCall.function.arguments)
 
                     try {
-                          console.log("👉 ChatGPT requested tool:", toolName)
-                          console.log("🧾 With args:", toolArgs)
-                        const toolResult = await executeTool(toolName, toolArgs)
-                         console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
+                        console.log("👉 ChatGPT requested tool:", toolName)
+                        console.log("🧾 With args:", toolArgs)
 
+                        const toolResult = await executeTool(toolName, toolArgs)
+                        console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
 
                         messages.push({
                             role: "tool",
@@ -410,6 +426,7 @@ async function invokeTool(message, maxIterations = 15) {
                     }
                 }
             } else {
+                saveMemory(sessionId, messages) // 🔥 persist memory
                 return choice.content || "No response"
             }
         } catch (error) {
@@ -418,6 +435,7 @@ async function invokeTool(message, maxIterations = 15) {
         }
     }
 
+    saveMemory(sessionId, messages) // 🔥 persist even if loop ends
     return "Max iterations reached"
 }
 

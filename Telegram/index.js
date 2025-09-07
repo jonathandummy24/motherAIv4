@@ -227,11 +227,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
   try {
     const { department } = session.data;
     await bot.sendChatAction(chatId, 'typing');
-    ;
-    console.log("The deparment");
-    console.log(department);
-    
-    
+
+  
     let responseMessage = ""
     
     if(department!==null){
@@ -268,38 +265,64 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
 
     }
     else if (department.trim().toLowerCase() === "seo") {
-      const res = await seo_specialist(userMessage)
-      await bot.sendMessage(chatId, res)
+      const text = await seo_specialist(userMessage)
+      const chunkSize = 4000; 
+    for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
     else if (department.trim().toLowerCase() === "website") {
-      const res = await website_agent(userMessage)
-      await bot.sendMessage(chatId, res)
+      const text = await website_agent(userMessage)
+      const chunkSize = 4000; 
+       for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
     else if (department.trim().toLowerCase() === "copywriter") {
-     
-      
-      const res = await copyWriting_agent(userMessage)
-      await bot.sendMessage(chatId, res)
+      const text = await copyWriting_agent(userMessage)
+      const chunkSize = 4000; 
+
+       for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
 
     else if (department.trim().toLowerCase() === "general") {
-      const res = await ask_cluade1(userMessage)
-      await bot.sendMessage(chatId, res);
+      const text = await ask_cluade1(userMessage)
+      const chunkSize = 4000; 
+
+      for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
     else if (department) {
-      const res = await ask_question(userMessage, department)
-      await bot.sendMessage(chatId, res);
+      const text = await ask_question(userMessage, department)
+      const chunkSize = 4000; 
+
+       for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
     }
     else {
-   console.log("Here")
-      const response = await invokeTool(userMessage)
-      await bot.sendMessage(chatId, response)
+       const text = await invokeTool(userMessage)
+
+        const chunkSize = 4000; 
+   
+    for (let i = 0; i < text.length; i += chunkSize) {
+      const chunk = text.substring(i, i + chunkSize);
+      await bot.sendMessage(chatId, chunk);
+    }
       return
     }
 

@@ -13,7 +13,6 @@ const REDIRECT_URL = process.env.REDIRECT_URL
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN
 
 
-console.log(CLIENT_ID,CLIENT_SECRET,REDIRECT_URL,REFRESH_TOKEN);
 
  const downloadDir = path.join(process.cwd(), 'downloads');
 const oauthclient = new google.auth.OAuth2(

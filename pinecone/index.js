@@ -35,9 +35,9 @@ async function ask_question(question,department) {
      
 
           const llm = new ChatOpenAI({
-            modelName: "gpt-4o-mini", // You can also use "gpt-4.1" or "gpt-4o"
+            modelName: "gpt-5-mini-2025-08-07", // You can also use "gpt-4.1" or "gpt-4o"
             openAIApiKey: process.env.OPENAI_API_KEY,
-            temperature: 0.7,
+            temperature: 1,
         });
 
         const memory = new BufferMemory({
