@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - motherAIv4
+name: Build and deploy Node.js app to Azure Web App - motherai
 
 on:
   push:
@@ -51,15 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_8423657F6A254C29B3434B9C2CD67E2E }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3E37B103F7D4475D9E364150855122D7 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E8A39BB7CA7F4350968F42AE78900B13 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_BAC1F80AB79C457A855C2E42334DC39F }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BC2196AA76846A49EC0A80A0724DF91 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_14EDD89AF48D4438B269F2A75B37F73A }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'motherAIv4'
+          app-name: 'motherai'
           slot-name: 'Production'
           package: .
           
