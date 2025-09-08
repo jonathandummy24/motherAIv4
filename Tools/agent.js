@@ -152,7 +152,7 @@
 
 //     while (iteration < maxIterations) {
 //         iteration++
-    
+
 
 //         try {
 //             const response = await client.messages.create({
@@ -162,7 +162,7 @@
 //                 tools: getToolDefinitions()
 //             })
 
-         
+
 
 //             // Add Claude's response to messages
 //             messages.push({
@@ -171,18 +171,18 @@
 //             })
 //             // Check if Claude wants to use a tool
 //             const toolUse = response.content.find(c => c.type === 'tool_use')
-            
+
 //             if (toolUse) {
 //                 const toolName = toolUse.name
 //                 const toolArgs = toolUse.input
-          
+
 //                 // await sendStatuses(`Executing Agent: ${toolName}`)
 //                 try {
 //                     console.log("👉 ChatGPT requested tool:", toolName)
 //                     console.log("🧾 With args:", toolArgs)
 //                     const toolResult = await executeTool(toolName, toolArgs)
 //                     console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
-                 
+
 //                     // Add tool result to messages
 //                     messages.push({
 //                         role: 'user',
@@ -192,13 +192,13 @@
 //                             content: JSON.stringify(toolResult)
 //                         }]
 //                     })
-                    
+
 //                     // Continue to next iteration to let Claude process the tool result
 //                     continue
 
 //                 } catch (error) {
 //                     console.error('Tool execution error:', error)
-                    
+
 //                     // Add error result to messages
 //                     messages.push({
 //                         role: 'user',
@@ -222,7 +222,7 @@
 //             return `Error: ${error.message}`
 //         }
 //     }
-    
+
 //     return 'Max iterations reached'
 // }
 
@@ -238,18 +238,10 @@ const { ask_question } = require("../pinecone/index")
 const { sendStatuses } = require("../Telegram/index")
 const { ask_cluade } = require("../ScriptTool/index")
 const { generateVideo } = require("../VideoTools/index")
+const { getMemory, addMemory } = require('../Memory/memory')
 dotenv.config({ path: path.resolve(__dirname, "../.env") })
 
 
-const memoryStore = new Map()
-
-function getMemory(sessionId) {
-  return memoryStore.get(sessionId) || []
-}
-
-function saveMemory(sessionId, messages) {
-  memoryStore.set(sessionId, messages)
-}
 
 async function listDepartment() {
     await sendStatuses("Executing List Departments..")
@@ -371,15 +363,33 @@ registerTool(
     }
 )
 
+function createSystemPrompt() {
+    return {
+        role: 'system',
+        content: `You are a helpful AI assistant with access to specialized tools. 
+
+IMPORTANT TOOL USAGE RULES:
+1. For ANY business question, department inquiry, or when you need specific/current data: ALWAYS use the ask_question tool first
+2. For video requests: ALWAYS use ask_cluade tool first to get script, then generateVideo tool
+3. When user asks about departments: use listDepartment tool
+4. Don't rely solely on memory - always use tools when appropriate
+5. If you're unsure whether to use a tool, err on the side of using it
+
+Your tools provide the most current and accurate information. Use them proactively.`
+    }
+}
 // OpenAI client
 const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 })
 
-async function invokeTool(message, sessionId = "default", maxIterations = 15) {
-    let messages = getMemory(sessionId)
+async function invokeTool(message, chatId, agent, maxIterations = 15) {
 
+    let messages = await getMemory(chatId, agent)
+
+    systemMessage =createSystemPrompt()
     // Add new user message
+    messages.unshift(systemMessage)
     messages.push({ role: 'user', content: message })
 
     let iteration = 0
@@ -409,7 +419,7 @@ async function invokeTool(message, sessionId = "default", maxIterations = 15) {
 
                         const toolResult = await executeTool(toolName, toolArgs)
                         console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
-
+                        
                         messages.push({
                             role: "tool",
                             tool_call_id: toolCall.id,
@@ -426,8 +436,9 @@ async function invokeTool(message, sessionId = "default", maxIterations = 15) {
                     }
                 }
             } else {
-                saveMemory(sessionId, messages) // 🔥 persist memory
-                return choice.content || "No response"
+                const res = choice.content || "No response"
+                await addMemory("system", res, agent, chatId)
+                return res
             }
         } catch (error) {
             console.error("OpenAI API error:", error)

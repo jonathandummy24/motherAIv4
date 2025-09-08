@@ -3,7 +3,7 @@ const dotenv = require("dotenv")
 const {SystemMessage,HumanMessage,AIMessage} =require("@langchain/core/messages")
 const {ChatOpenAI} = require("@langchain/openai")
 const { createFileinDateFolder, getBrandNameText } = require("../Google")
-const { addMemory, getMemory } = require("../Memory/memory")
+const { addMemory, getMemory, addMemoryWeb } = require("../Memory/memory")
 
 dotenv.config({path: path.resolve(__dirname, "../.env")})
 
@@ -76,8 +76,12 @@ async function website_agent(question, chatId, agent) {
     temperature: 1,
   });
 
+  console.log("The chat ");
+  console.log(chatId);
+  
+  
   // Load previous memory
-  let messages = await getMemory(chatId,agent)
+  let messages = await getMemory(chatId.toString(),agent)
 
   // If first time, set system instruction
   if (messages.length === 0) {
@@ -87,12 +91,13 @@ async function website_agent(question, chatId, agent) {
       )
     );
   }
-// Add new user input
   messages.push({ role: "user", content: question });
 
   try {
     const response = await model.invoke(messages);
-    await addMemory("system", response.content, agent, chatId)
+    await addMemoryWeb("system", response.content, agent, chatId)
+    // console.log(response.content);
+    
     return response.content;
   } catch (error) {
     return error.message;

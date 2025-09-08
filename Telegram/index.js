@@ -320,7 +320,7 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     }
     }
     else {
-       const text = await invokeTool(userMessage)
+       const text = await invokeTool(userMessage,chatId,'motherAI')
 
         const chunkSize = 4000; 
    
