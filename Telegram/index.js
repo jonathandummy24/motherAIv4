@@ -11,6 +11,7 @@ const { createFileinDateFolder, uploadVideoToDrive } = require('../Google/index'
 const { ask_cluade1, website_agent, seo_specialist, copyWriting_agent } = require("../ScriptTool");
 const { ask_question } = require("../pinecone");
 const { generateVideo } = require("../VideoTools");
+const { addMemory } = require("../Memory/memory");
 
 const loginSteps = new Map();
 
@@ -265,7 +266,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
 
     }
     else if (department.trim().toLowerCase() === "seo") {
-      const text = await seo_specialist(userMessage)
+      const text = await seo_specialist(userMessage,chatId,department.trim().toLowerCase())
+       await addMemory('user',userMessage, department.trim().toLowerCase(),chatId)
       const chunkSize = 4000; 
     for (let i = 0; i < text.length; i += chunkSize) {
       const chunk = text.substring(i, i + chunkSize);
@@ -274,7 +276,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
       return
     }
     else if (department.trim().toLowerCase() === "website") {
-      const text = await website_agent(userMessage)
+      const text = await website_agent(userMessage, chatId, 'website')
+      await addMemory('user',userMessage, 'website',chatId)
       const chunkSize = 4000; 
        for (let i = 0; i < text.length; i += chunkSize) {
       const chunk = text.substring(i, i + chunkSize);
@@ -283,7 +286,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
       return
     }
     else if (department.trim().toLowerCase() === "copywriter") {
-      const text = await copyWriting_agent(userMessage)
+      await addMemory('user',userMessage, 'copywriter',chatId)
+      const text = await copyWriting_agent(userMessage,chatId,'copywriter')
       const chunkSize = 4000; 
 
        for (let i = 0; i < text.length; i += chunkSize) {
@@ -294,7 +298,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     }
 
     else if (department.trim().toLowerCase() === "general") {
-      const text = await ask_cluade1(userMessage)
+      const text = await ask_cluade1(userMessage, chatId,'general')
+      await addMemory('user',userMessage, 'general',chatId)
       const chunkSize = 4000; 
 
       for (let i = 0; i < text.length; i += chunkSize) {

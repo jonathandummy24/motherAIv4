@@ -3,25 +3,11 @@ const dotenv = require("dotenv")
 const {SystemMessage,HumanMessage,AIMessage} =require("@langchain/core/messages")
 const {ChatOpenAI} = require("@langchain/openai")
 const { createFileinDateFolder, getBrandNameText } = require("../Google")
+const { addMemory, getMemory } = require("../Memory/memory")
 
 dotenv.config({path: path.resolve(__dirname, "../.env")})
 
- const memoryStore1 = new Map();
- const memoryStore2 = new Map();
- const memoryStore3 = new Map();
- const memoryStore4 = new Map();
- const memoryStore5 = new Map();
-const memoryStore6 = new Map();
-async function ask_cluade(question, sessionId = "default") {
-
-  function getMemory(sessionId) {
-    return memoryStore5.get(sessionId) || [];
-  }
-
-  function saveMemory(sessionId, messages) {
-    memoryStore5.set(sessionId, messages);
-  }
-
+async function ask_cluade(question, chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"
     openAIApiKey: process.env.OPENAI_API_KEY,
@@ -29,7 +15,7 @@ async function ask_cluade(question, sessionId = "default") {
   });
 
   // Load memory for this session
-  let messages = getMemory(sessionId);
+  let messages = await getMemory(chatId,agent);
 
   // If first time, set system instruction
   if (messages.length === 0) {
@@ -41,18 +27,11 @@ async function ask_cluade(question, sessionId = "default") {
   }
 
   // Add new user input
-  messages.push(new HumanMessage({ content: question }));
+   messages.push({ role: "user", content: question });
 
   try {
     const response = await model.invoke(messages);
-
-    // Save response in memory
-    messages.push(response);
-    saveMemory(sessionId, messages);
-
-    // Save response to file
-    await createFileinDateFolder(response.content);
-
+    await addMemory("system", response.content, agent, chatId)
     return response.content;
   } catch (error) {
     return error.message;
@@ -60,16 +39,7 @@ async function ask_cluade(question, sessionId = "default") {
 }
 
 
-async function ask_cluade1(question, sessionId = "default") {
-  // In-memory store
-
-function getMemory(sessionId) {
-    return memoryStore1.get(sessionId) || [];
-  }
-
-  function saveMemory(sessionId, messages) {
-    memoryStore1.set(sessionId, messages);
-  }
+async function ask_cluade1(question, chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"
     openAIApiKey: process.env.OPENAI_API_KEY,
@@ -78,25 +48,20 @@ function getMemory(sessionId) {
 
 
   // Load previous memory
-  let messages = getMemory(sessionId);
-
+  let messages = await getMemory(chatId,agent);
+  
   // If first time, set system role
   if (messages.length === 0) {
     messages.push(
       new SystemMessage("You are a helpful assistant")
     );
   }
-
   // Add new user input
-  messages.push(new HumanMessage({ content: question }));
+  messages.push({ role: "user", content: question });
 
   try {
     const response = await model.invoke(messages);
-
-    // Save response into memory
-    messages.push(response);
-    saveMemory(sessionId, messages);
-console.log(messages);
+    await addMemory("system", response.content, agent, chatId)
     return response.content;
   } catch (error) {
     return error.message;
@@ -104,17 +69,7 @@ console.log(messages);
 }
 
 
-async function website_agent(question, sessionId = "default") {
-
-
-  function getMemory(sessionId) {
-    return memoryStore2.get(sessionId) || [];
-  }
-
-  function saveMemory(sessionId, messages) {
-    memoryStore2.set(sessionId, messages);
-  }
-
+async function website_agent(question, chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"
     openAIApiKey: process.env.OPENAI_API_KEY,
@@ -122,7 +77,7 @@ async function website_agent(question, sessionId = "default") {
   });
 
   // Load previous memory
-  let messages = getMemory(sessionId);
+  let messages = await getMemory(chatId,agent)
 
   // If first time, set system instruction
   if (messages.length === 0) {
@@ -132,17 +87,12 @@ async function website_agent(question, sessionId = "default") {
       )
     );
   }
-
-  // Add new user input
-  messages.push(new HumanMessage({ content: question }));
+// Add new user input
+  messages.push({ role: "user", content: question });
 
   try {
     const response = await model.invoke(messages);
-
-    // Save response into memory
-    messages.push(response);
-    saveMemory(sessionId, messages);
-
+    await addMemory("system", response.content, agent, chatId)
     return response.content;
   } catch (error) {
     return error.message;
@@ -151,16 +101,7 @@ async function website_agent(question, sessionId = "default") {
 
 
 
-async function copyWriting_agent(question, sessionId = "default") {
-
-  function getMemory(sessionId) {
-    return memoryStore3.get(sessionId) || [];
-  }
-
-  function saveMemory(sessionId, messages) {
-    memoryStore3.set(sessionId, messages);
-  }
-
+async function copyWriting_agent(question,chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"
     openAIApiKey: process.env.OPENAI_API_KEY,
@@ -168,9 +109,8 @@ async function copyWriting_agent(question, sessionId = "default") {
   });
 
   const content = await getBrandNameText();
-
   // Load previous memory
-  let messages = getMemory(sessionId);
+  let messages =  await getMemory(chatId,agent);
 
   // If first time, set system message with brand tone
   if (messages.length === 0) {
@@ -182,15 +122,11 @@ async function copyWriting_agent(question, sessionId = "default") {
   }
 
   // Add new user input
-  messages.push(new HumanMessage({ content: question }));
+  messages.push({ role: "user", content: question });
 
   try {
     const response = await model.invoke(messages);
-
-    // Save response into memory
-    messages.push(response);
-    saveMemory(sessionId, messages);
-
+    await addMemory("system", response.content, agent, chatId)
     return response.content;
   } catch (error) {
     return error.message;
@@ -200,16 +136,7 @@ async function copyWriting_agent(question, sessionId = "default") {
 
 
 
-async function seo_specialist(question,sessionId = "default") {
-
-
-function getMemory(sessionId) {
-  return memoryStore4.get(sessionId) || []
-}
-
-function saveMemory(sessionId, messages) {
-  memoryStore4.set(sessionId, messages)
-}
+async function seo_specialist(question, chatId, agent) {
 
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // You can also use "gpt-4.1" or "gpt-4o"
@@ -217,7 +144,7 @@ function saveMemory(sessionId, messages) {
    temperature: 1,
   });
   // Load previous memory
-  let messages = getMemory(sessionId)
+  let messages = await getMemory(chatId,agent)
 
   // If first time, set system instruction
   if (messages.length === 0) {
@@ -229,17 +156,10 @@ function saveMemory(sessionId, messages) {
   }
 
   // Add new user input
-  messages.push(new HumanMessage({ content: question }))
-
-
-
+  messages.push({ role: "user", content: question });
 try {
     const response = await model.invoke(messages)
-
-    // Save response to memory
-    messages.push(response)
-    saveMemory(sessionId, messages)
-
+    await addMemory("system", response.content, agent, chatId)
     return response.content
     
 } catch (error) {

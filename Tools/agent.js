@@ -389,7 +389,7 @@ async function invokeTool(message, sessionId = "default", maxIterations = 15) {
 
         try {
             const response = await client.chat.completions.create({
-                model: "gpt-4.1",
+                model: "gpt-5-mini-2025-08-07",
                 messages,
                 tools: getToolDefinitions(),
                 tool_choice: "auto",

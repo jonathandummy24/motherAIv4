@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev":"nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,12 +21,13 @@
     "axios": "^1.11.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "firebase-admin": "^13.4.0",
     "googleapis": "^154.0.0",
     "langchain": "^0.3.30",
     "mammoth": "^1.10.0",
+    "mssql": "^11.0.1",
     "node-telegram-bot-api": "^0.66.0",
     "nodemon": "^3.1.10",
     "openai": "^5.19.1",
