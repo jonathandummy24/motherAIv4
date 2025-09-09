@@ -3,11 +3,7 @@ const {sqlConfig}= require("../config/index")
 
 async function addMemory(role, message, agent, chatId){
     try {
-         console.log("The ting");
-        console.log(role);
-         console.log(message);
-          console.log(agent);
-           console.log(chatId);
+        
 
         const pool = await sql.connect(sqlConfig)
         const res= await pool.request().query(`
@@ -17,11 +13,9 @@ async function addMemory(role, message, agent, chatId){
             `)   
 
         return res
-
     } catch (error) {
 
-        console.log(error);
-        
+        console.log(error);    
       return error.message  
     }
 }
@@ -61,7 +55,9 @@ async function getMemory(chatId, agent){
             
         return res.recordset
     } catch (error) {
+        console.log(error);
         
+        throw new Error(error)
     }
 }
 
