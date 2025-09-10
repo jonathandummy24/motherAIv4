@@ -1,11 +1,17 @@
 const path = require("path")
 const dotenv = require("dotenv")
-const {SystemMessage,HumanMessage,AIMessage} =require("@langchain/core/messages")
+const {SystemMessage,HumanMessage,ToolMessage} =require("@langchain/core/messages")
 const {ChatOpenAI} = require("@langchain/openai")
 const { createFileinDateFolder, getBrandNameText } = require("../Google")
 const { addMemory, getMemory, addMemoryWeb } = require("../Memory/memory")
-
 dotenv.config({path: path.resolve(__dirname, "../.env")})
+const { tavily } = require("@tavily/core")
+const OpenAI = require('openai')
+const tavilyClient = tavily({ apiKey: process.env.TAVILY_API_KEY })
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 
 async function web_search({ query }) {
@@ -23,7 +29,6 @@ async function web_search({ query }) {
     snippet: item.snippet,
   })) || [];
 }
-
 async function ask_cluade(question, chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"
@@ -54,6 +59,10 @@ async function ask_cluade(question, chatId, agent) {
     return error.message;
   }
 }
+
+
+
+
 
 
 async function ask_cluade1(question, chatId, agent) {
@@ -189,4 +198,7 @@ try {
 }
    
 }
+
+
+
 module.exports={ask_cluade, ask_cluade1,seo_specialist, website_agent,copyWriting_agent}

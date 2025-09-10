@@ -1,24 +1,27 @@
 const sql = require("mssql")
 const {sqlConfig}= require("../config/index")
 
-async function addMemory(role, message, agent, chatId){
-    try {
-        
+async function addMemory(role, message, agent, chatId) {
+  try {
+    const pool = await sql.connect(sqlConfig);
 
-        const pool = await sql.connect(sqlConfig)
-        const res= await pool.request().query(`
-            INSERT INTO Conversations (role, content, agent, chatId)
-            VALUES ('${role}', '${message}', '${agent}', '${chatId}');
-            
-            `)   
+    const res = await pool.request()
+      .input("role", sql.NVarChar, role)
+      .input("content", sql.NVarChar, message)
+      .input("agent", sql.NVarChar, agent)
+      .input("chatId", sql.NVarChar, chatId)
+      .query(`
+        INSERT INTO Conversations (role, content, agent, chatId)
+        VALUES (@role, @content, @agent, @chatId)
+      `);
 
-        return res
-    } catch (error) {
-
-        console.log(error);    
-      return error.message  
-    }
+    return res;
+  } catch (error) {
+    console.log(error);
+    return error.message;
+  }
 }
+
 
 
 async function addMemoryWeb(role, message, agent, chatId) {
@@ -28,10 +31,10 @@ async function addMemoryWeb(role, message, agent, chatId) {
   try {
     const pool = await sql.connect(sqlConfig);
     const res = await pool.request()
-      .input("role", sql.VarChar, role)
+      .input("role", sql.NVarChar, role)
       .input("content", sql.NVarChar(sql.MAX), message)  // safe for long HTML/text
-      .input("agent", sql.VarChar, agent)
-      .input("chatId", sql.VarChar, chatId.toString())
+      .input("agent", sql.NVarChar, agent)
+      .input("chatId", sql.NVarChar, chatId.toString())
       .query(`
         INSERT INTO Conversations (role, content, agent, chatId)
         VALUES (@role, @content, @agent, @chatId);

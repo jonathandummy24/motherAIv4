@@ -240,8 +240,34 @@ const { ask_cluade } = require("../ScriptTool/index")
 const { generateVideo } = require("../VideoTools/index")
 const { getMemory, addMemory } = require('../Memory/memory')
 dotenv.config({ path: path.resolve(__dirname, "../.env") })
+const {tavily} = require("@tavily/core")
 
 
+const client1 = tavily({apiKey: process.env.TAVILY_API_KEY })
+
+
+async function askTavily(question,topic = "general", maxResults = 5){
+    try {
+      const res = await client1.search(question, {
+      topic,
+      max_results: maxResults,
+      include_answer: true,
+    });
+
+
+        if(res.answer){
+            return `${res.answer}`
+        }
+        let formatted = `🔎 Search results for "${question}":\n\n`;
+    res.results.forEach((r, i) => {
+      formatted += `${i + 1}. ${r.title}\n${r.content}\n\n`;
+    });
+
+    return formatted.trim();
+    } catch (err) {
+         return `⚠ Tavily search failed: ${err.message}`;
+    }
+}
 
 async function listDepartment() {
     await sendStatuses("Executing List Departments..")
@@ -338,6 +364,21 @@ registerTool(
 )
 
 registerTool(
+    'askTavily',
+    async (args) => {
+        return await askTavily(args.question)
+    },
+    "Search the internet for up-to-date information, news, or factual queries",
+    {
+        type: "object",
+        properties: {
+            question: { type: "string", description: "The question to be asked" }
+        },
+        required: ["question"]
+    }
+)
+
+registerTool(
     'generateVideo',
     async (args) => {
         return await generateVideo(args.script)
@@ -367,6 +408,8 @@ function createSystemPrompt() {
     return {
         role: 'system',
         content: `You are a helpful AI assistant with access to specialized tools. 
+        
+CRITICAL: Only answer the CURRENT/LATEST user question. Do not re-answer previous questions from the conversation history.
 
 IMPORTANT TOOL USAGE RULES:
 1. For ANY business question, department inquiry, or when you need specific/current data: ALWAYS use the ask_question tool first
@@ -387,6 +430,9 @@ async function invokeTool(message, chatId, agent, maxIterations = 15) {
 
     let messages = await getMemory(chatId, agent)
 
+    console.log("Memory", messages);
+    
+
     systemMessage =createSystemPrompt()
     // Add new user message
     messages.unshift(systemMessage)
@@ -399,7 +445,7 @@ async function invokeTool(message, chatId, agent, maxIterations = 15) {
 
         try {
             const response = await client.chat.completions.create({
-                model: "gpt-5-mini-2025-08-07",
+                model: "gpt-5",
                 messages,
                 tools: getToolDefinitions(),
                 tool_choice: "auto",
@@ -421,14 +467,28 @@ async function invokeTool(message, chatId, agent, maxIterations = 15) {
                         console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
                         
                         messages.push({
-                            role: "tool",
+                            role: "system",
                             tool_call_id: toolCall.id,
                             content: JSON.stringify(toolResult)
                         })
+                        if (["askTavily", "ask_question"].includes(toolName)) {
+                            const res = typeof toolResult === "string"
+                                ? toolResult
+                                : JSON.stringify(toolResult)
+
+                                console.log("The Response");
+                                
+                                console.log(res);
+                                
+                                console.log("\n");
+                                
+                            await addMemory("system", res, agent, chatId)
+                            return res
+                        }
                         continue
                     } catch (error) {
                         messages.push({
-                            role: "tool",
+                            role: "system",
                             tool_call_id: toolCall.id,
                             content: `Error: ${error.message}`
                         })
