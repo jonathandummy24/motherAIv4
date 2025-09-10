@@ -7,6 +7,23 @@ const { addMemory, getMemory, addMemoryWeb } = require("../Memory/memory")
 
 dotenv.config({path: path.resolve(__dirname, "../.env")})
 
+
+async function web_search({ query }) {
+  const apiKey = process.env.BING_API_KEY; // Or SerpAPI, Google, etc.
+  const url = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}`;
+
+  const res = await fetch(url, {
+    headers: { "Ocp-Apim-Subscription-Key": apiKey },
+  });
+  const data = await res.json();
+
+  return data.webPages?.value.map((item) => ({
+    title: item.name,
+    url: item.url,
+    snippet: item.snippet,
+  })) || [];
+}
+
 async function ask_cluade(question, chatId, agent) {
   const model = new ChatOpenAI({
     modelName: "gpt-5-mini-2025-08-07", // or "gpt-4.1" / "gpt-4o"

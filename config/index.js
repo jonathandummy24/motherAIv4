@@ -14,7 +14,8 @@ const sqlConfig = {
   password: process.env.DB_PWD ,
   database: process.env.DB_NAME ,
   server: process.env.SERVER ,
-
+  connectionTimeout: 30000, 
+  requestTimeout: 30000,
   pool: {
     max: 10,
     min: 0,
