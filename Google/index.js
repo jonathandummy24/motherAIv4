@@ -280,9 +280,57 @@ async function getBrandNameText(){
 }
 
 
+async function findorCreateDateFolderInRoot(folderName) {
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    try {
+        // Search for existing folder in root
+        const searchResponse = await drive.files.list({
+            q: `name='${folderName}' and parents in 'root' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+            fields: 'files(id, name)'
+        });
 
+        if (searchResponse.data.files && searchResponse.data.files.length > 0) {
+            // Folder exists, return its ID
+            console.log(`Found existing folder: ${folderName} in root`);
+            return searchResponse.data.files[0].id;
+        }
+
+        // Create new folder in root (no parents specified)
+        const folderMetadata = {
+            name: folderName,
+            mimeType: 'application/vnd.google-apps.folder'
+            // Omitting parents creates folder in root
+        };
+
+        const createResponse = await drive.files.create({
+            resource: folderMetadata,
+            fields: 'id, name'
+        });
+
+        console.log(`Created new folder: ${folderName} in root`);
+        return createResponse.data.id;
+
+    } catch (error) {
+        console.error('Error finding/creating date folder in root:', error);
+        throw error;
+    }
+}
+
+async  function createNewFolder(folderName){
+  try {
+    
+    const response = await findorCreateDateFolderInRoot(folderName)
+
+    return response
+  } catch (error) {
+    
+  }
+}
 module.exports={
     createFileinDateFolder,
     uploadVideoToDrive,
-    getBrandNameText
+    getBrandNameText,
+    createNewFolder
 }
