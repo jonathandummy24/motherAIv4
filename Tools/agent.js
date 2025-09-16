@@ -467,7 +467,7 @@ async function invokeTool(message, chatId, agent, maxIterations = 15) {
                         console.log("✅ Tool result:", JSON.stringify(toolResult, null, 2))
                         
                         messages.push({
-                            role: "system",
+                            role: "tool",
                             tool_call_id: toolCall.id,
                             content: JSON.stringify(toolResult)
                         })

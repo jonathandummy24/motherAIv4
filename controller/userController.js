@@ -182,6 +182,9 @@ async function getUserDepartment(email) {
     }
     
     const userData = userDoc.data();
+
+    console.log();
+    
     return userData.department || null;
   } catch (error) {
     if (error.code === 'auth/user-not-found') {

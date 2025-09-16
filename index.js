@@ -10,6 +10,7 @@ const app= express()
 app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 app.use(express.json())
+app.use('/ai', router)
 
 const downloadDir = path.join(__dirname, 'downloads');
 if (!fs.existsSync(downloadDir)) {
@@ -19,7 +20,7 @@ if (!fs.existsSync(downloadDir)) {
 app.get("/test", (req,res)=>{
     res.status(200).send("<h1> Hello There, we are live!! </h1>")
 })
-app.use('/ai', router)
+
 app.listen(process.env.PORT,()=>{
     console.log("App Running...",process.env.PORT);
 })
