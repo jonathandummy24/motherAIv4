@@ -146,13 +146,16 @@ await addMemory('user',message,"MotherAI", from.toString())
 
 async function sendVideoViaURL(to) {
     try {
-        console.log("Sending video from local file");
         const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+        
+        // Upload your video to GitHub and use the raw URL
+        const publicVideoUrl = "https://github.com/yourusername/yourrepo/raw/main/videos/your-video.mp4";
+        
         const message = await client.messages.create({
             from: process.env.TWILIO_WHATSAPP_NUMBER,
             to: to,
-            body: "caption",
-            mediaUrl: [`https://www.youtube.com/watch?v=RlPNh_PBZb4`] // This might work for local testing
+            body: "Here's your video!",
+            mediaUrl: [publicVideoUrl]
         });
         
         console.log(`Video sent successfully! Message SID: ${message.sid}`);
@@ -301,6 +304,59 @@ async function sendWhatsAppMessage(client, to, from, body) {
 }
 
 
+
+async function askAI(req,res){
+
+    try {
+        const{email, question}= req.body
+
+        const department = await getUserDepartment(email)
+        const response= await processRequest(email,department, question)
+
+       return  res.status(200).json(response)
+
+    } catch (error) {
+        console.log(error);
+        
+       return  res.status(500).json(error)
+    }
+}
+
+async function processRequest(email, department, message) {
+
+    if(!department){
+        const text5 = await invokeTool(message, email, 'motherAI')
+        return text5
+    }
+    const dept = department.toLowerCase();
+
+    switch (dept) {
+        case "seo":
+            const text = await seo_specialist(message, email, dept)
+            return text;
+        case "website":
+            const text1 = await website_agent(message, email, dept)
+            return text1;
+        case "copywriter":
+            const text2 = await copyWriting_agent(message, email, dept)
+            return text2;
+        case "general":
+            const text3 = await ask_cluade1(message, email, dept)
+            return text3;
+        case "video":
+            //work on it
+            // const text4 = await ask_cluade1(message, email, dept)
+            // return text4
+            // await sendVideoViaURL(email)
+        default:
+            //Mother AI
+            const text5 = await invokeTool(message, email, 'motherAI')
+            return text5
+    }
+}
+
+
 module.exports={
-    sendandReply
+    sendandReply,
+    askAI
 }
