@@ -272,7 +272,7 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     
     if(department !== null){
       if (department && department.trim().toLowerCase() === 'video') {
-        const text = await ask_cluade1(userMessage)
+        const text = await ask_cluade1(userMessage,chatId.toString(),'video')
 
           const chunkSize = 4000; 
         for (let i = 0; i < text.length; i += chunkSize) {
@@ -287,28 +287,28 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
         //   parse_mode: "None",
         //   disable_web_page_preview: true
         // })
-        await createFileinDateFolder(responseMessage)
+        // await createFileinDateFolder(responseMessage)
         
-        statusMessage = await bot.sendMessage(chatId, "🎬 Generating your video... This may take some minutes, please wait!");
+        // statusMessage = await bot.sendMessage(chatId, "🎬 Generating your video... This may take some minutes, please wait!");
 
-        const videoPath = await generateVideo(userMessage)
-        // const videoPath = path.join(__dirname, 'generated_videos', videoName);
-        // const videoPath=`C:\\Users\\Joe\\Desktop\\Coltium\\motherAIv4\\VideoTools\\generated_videos\\${videoName}`
-        console.log(videoPath);
+        // const videoPath = await generateVideo(userMessage)
+        // // const videoPath = path.join(__dirname, 'generated_videos', videoName);
+        // // const videoPath=`C:\\Users\\Joe\\Desktop\\Coltium\\motherAIv4\\VideoTools\\generated_videos\\${videoName}`
+        // console.log(videoPath);
         
-        await bot.editMessageText("📤 Video ready! Uploading to Telegram...", {
-          chat_id: chatId,
-          message_id: statusMessage.message_id
-        });
+        // await bot.editMessageText("📤 Video ready! Uploading to Telegram...", {
+        //   chat_id: chatId,
+        //   message_id: statusMessage.message_id
+        // });
 
-        const videoStream = fs.createReadStream(videoPath);
-        await bot.sendVideo(chatId, videoStream);
+        // const videoStream = fs.createReadStream(videoPath);
+        // await bot.sendVideo(chatId, videoStream);
 
-        await uploadVideoToDrive(videoPath)
-        await bot.deleteMessage(chatId, statusMessage.message_id);
-        if (existsSync(videoPath)) {
-          unlinkSync(videoPath);
-        }
+        // await uploadVideoToDrive(videoPath)
+        // await bot.deleteMessage(chatId, statusMessage.message_id);
+        // if (existsSync(videoPath)) {
+        //   unlinkSync(videoPath);
+        // }
         return
       }
       else if (department.trim().toLowerCase() === "seo") {

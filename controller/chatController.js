@@ -76,8 +76,6 @@ function isValidEmail(email) {
     return res
 }
 
-
-
 async function sendandReply(req, res) {
     const from = req.body.From;
     const to = req.body.To;
@@ -186,6 +184,8 @@ async function sendVideoViaURL(to,userMessage) {
     try {
 
         console.log("The message", userMessage);
+
+        await addMemory('user',userMessage,'video', to.toString())
         
         const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
         
@@ -309,7 +309,7 @@ async function handleAuthenticatedUser(from, message) {
             "🔐 Thank you! Now please enter your password:");
     }
 
-    async function handlePasswordInput(phoneNumber, password) {
+async function handlePasswordInput(phoneNumber, password) {
 
         const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
         const session = SessionManager.getSession(phoneNumber);
@@ -352,7 +352,7 @@ async function handleAuthenticatedUser(from, message) {
     }
 
 
-    async function sendWhatsAppMessage(client, to, from, body) {
+async function sendWhatsAppMessage(client, to, from, body) {
         try {
             const chunkSize = 1500;
             for (let i = 0; i < body.length; i += chunkSize) {
@@ -372,13 +372,22 @@ async function handleAuthenticatedUser(from, message) {
 
 
 
-    async function askAI(req, res) {
+async function askAI(req, res) {
 
         try {
             const { email, question } = req.body
 
             const department = await getUserDepartment(email)
             const response = await processRequest(email, department, question)
+
+            if(department){
+                await addMemory('user',question, department, email)
+                await addMemory('system',response, department, email)
+
+            }else{
+                await addMemory('user',question, "motherAI", email)
+                await addMemory('system',response, "motherAI", email)
+            }
 
             return res.status(200).json(response)
 
@@ -389,7 +398,7 @@ async function handleAuthenticatedUser(from, message) {
         }
     }
 
-    async function processRequest(email, department, message) {
+async function processRequest(email, department, message) {
 
         if (!department) {
             const text5 = await invokeTool(message, email, 'motherAI')
@@ -421,7 +430,6 @@ async function handleAuthenticatedUser(from, message) {
                 return text5
         }
     }
-
 
     module.exports = {
         sendandReply,
