@@ -18,7 +18,7 @@ if (!fs.existsSync(downloadDir)) {
 }
 
 app.get("/test", (req,res)=>{
-    res.status(200).send("<h1> Hello There, we are live!! </h1>")
+    res.status(200).send("<h1> Hello There !! </h1>")
 })
 
 app.listen(process.env.PORT,()=>{
