@@ -7,6 +7,8 @@ const dotenv = require('dotenv')
 const path = require('path')
 const fs = require('fs');
 const { createNewFolder } = require("../Google");
+const { generateVideo } = require("../VideoTools");
+const { uploadVideoToAzure } = require("../Blob/upload");
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -180,13 +182,21 @@ async function sendandReply(req, res) {
 }
 
 
-async function sendVideoViaURL(to) {
+async function sendVideoViaURL(to,userMessage) {
     try {
+
+        console.log("The message", userMessage);
+        
         const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+        
+        const videoPath = await generateVideo(userMessage)
+        
+        const safePath = path.normalize(videoPath);
 
-        // Upload your video to GitHub and use the raw URL
-        const publicVideoUrl = "https://github.com/yourusername/yourrepo/raw/main/videos/your-video.mp4";
+        const publicVideoUrl = await uploadVideoToAzure(safePath)
 
+        console.log("The URl"+ publicVideoUrl);
+        
         const message = await client.messages.create({
             from: process.env.TWILIO_WHATSAPP_NUMBER,
             to: to,
@@ -223,7 +233,7 @@ async function processDepartmentMessage(phone, department, message) {
             //work on it
             // const text4 = await ask_cluade1(message, phone.toString(), dept)
             // return text4
-            await sendVideoViaURL(phone)
+            await sendVideoViaURL(phone,message)
         default:
             //Mother AI
             const text5 = await invokeTool(message, phone.toString(), 'motherAI')
@@ -404,7 +414,7 @@ async function handleAuthenticatedUser(from, message) {
             //work on it
             // const text4 = await ask_cluade1(message, email, dept)
             // return text4
-            // await sendVideoViaURL(email)
+             await sendVideoViaURL(email,message)
             default:
                 //Mother AI
                 const text5 = await invokeTool(message, email, 'motherAI')

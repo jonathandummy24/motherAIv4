@@ -87,7 +87,7 @@ async function ask_cluade1(question, chatId, agent) {
 
   try {
     const response = await model.invoke(messages);
-    await addMemory("system", response.content, agent, chatId)
+    // await addMemory("system", response.content, agent, chatId)
     return response.content;
   } catch (error) {
     return error.message;

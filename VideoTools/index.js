@@ -18,7 +18,9 @@ if (!existsSync(videosDir)) {
 
 async function generateVideo(prompt) {
   try {
-
+    console.log("Herro");
+    
+console.log(prompt);
 
     
     let operation = await ai.models.generateVideos({
@@ -77,6 +79,10 @@ async function generateVideo(prompt) {
       
       const vpath = path.join(__dirname, 'generated_videos', videoName);
 
+      console.log('The Path is Here');
+      
+      console.log(vpath);
+      
  
       
       await uploadVideoToDrive(vpath)

@@ -272,11 +272,21 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
     
     if(department !== null){
       if (department && department.trim().toLowerCase() === 'video') {
-        responseMessage = await ask_cluade1(userMessage)
-        await bot.sendMessage(chatId, responseMessage, {
+        const text = await ask_cluade1(userMessage)
+
+          const chunkSize = 4000; 
+        for (let i = 0; i < text.length; i += chunkSize) {
+          const chunk = text.substring(i, i + chunkSize);
+          await bot.sendMessage(chatId, chunk,{
           parse_mode: "None",
           disable_web_page_preview: true
-        })
+        });
+        }
+
+        // await bot.sendMessage(chatId, responseMessage, {
+        //   parse_mode: "None",
+        //   disable_web_page_preview: true
+        // })
         await createFileinDateFolder(responseMessage)
         
         statusMessage = await bot.sendMessage(chatId, "🎬 Generating your video... This may take some minutes, please wait!");
@@ -284,7 +294,8 @@ async function handleAuthenticatedMessage(chatId, userMessage, username, session
         const videoPath = await generateVideo(userMessage)
         // const videoPath = path.join(__dirname, 'generated_videos', videoName);
         // const videoPath=`C:\\Users\\Joe\\Desktop\\Coltium\\motherAIv4\\VideoTools\\generated_videos\\${videoName}`
-
+        console.log(videoPath);
+        
         await bot.editMessageText("📤 Video ready! Uploading to Telegram...", {
           chat_id: chatId,
           message_id: statusMessage.message_id
